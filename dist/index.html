@@ -41,20 +41,41 @@
     }
 
     button {
-      width: 100%;
       padding: 10px;
-      background: #e63946;
-      color: white;
       font-weight: bold;
-      font-size: 15px;
+      font-size: 14px;
       border: none;
       border-radius: 6px;
       cursor: pointer;
       transition: background 0.3s;
     }
 
-    button:hover {
+    #submitBtn {
+      width: 100%;
+      background: #e63946;
+      color: white;
+      margin-top: 10px;
+    }
+
+    #submitBtn:hover {
       background: #d62828;
+    }
+
+    .toggle-group {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .toggle-btn {
+      width: 48%;
+      background: #ccc;
+      color: black;
+    }
+
+    .toggle-btn.active {
+      background: #1d3557;
+      color: white;
     }
 
     ul {
@@ -76,20 +97,45 @@
       margin: 10px 0;
       color: #555;
     }
+
+    #resetBtn {
+      
+      width: 100%;
+      background: #c0392b;
+      color: white;
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: bold;
+      border: none;
+      cursor: pointer;
+}
+
+#resetBtn:hover {
+  background: #a93226;
+}
+
   </style>
 </head>
 <body>
   <div class="container">
     <h2>Website Blocker</h2>
-    <input type="text" id="userInput" placeholder="e.g. Block Instagram and YouTube for 1 hour" />
-    <button id="submitBtn">Block</button>
+
+    <div class="toggle-group">
+      <button id="blockToggle" class="toggle-btn active">Block</button>
+      <button id="focusToggle" class="toggle-btn">Youtube</button>
+    </div>
+
+    <input type="text" id="userInput" placeholder="Enter your instruction here..." />
+    <button id="submitBtn">Submit</button>
+    <button id="resetBtn" class="btn danger">Reset YouTube</button>
+
+
     <p id="status">Status: Waiting for input</p>
 
     <h3>Currently Blocked Websites:</h3>
-    <!-- <ul id="blockedList"></ul> -->
-    <!-- Add this where you want the countdowns to show -->
-<div id="countdownContainer" style="margin-top: 10px;"></div>
-
+    <div id="countdownContainer" style="margin-top: 10px;"></div>
   </div>
 
   <script src="popup.js"></script>

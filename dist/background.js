@@ -135,4 +135,14 @@ chrome.storage.onChanged.addListener((changes, area) => {
         console.log("🔁 Blocked sites updated:", changes.blockedSites.newValue);
         updateBlockRules();
     }
+
+    chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+        if (message.action === "reset_youtube") {
+            chrome.storage.local.set({ shouldReset: true }, () => {
+                console.log("Resetting YouTube settings...");
+                // Insert logic to actually reset YouTube here, if not already elsewhere
+            });
+        }
+    });
+    
 });
