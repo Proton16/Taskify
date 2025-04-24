@@ -227,18 +227,19 @@ async function extractBlockData(userPrompt) {
 You are an assistant that extracts data from natural language instructions.
 
 From the user prompt, extract:
-- A list of websites to be blocked, using their **correct and complete root domain names**, exactly as they appear in the browser (e.g., "www.facebook.com", "www.instagram.com", "leetcode.com", "x.com", "www.youtube.com").
+- A list of websites to be blocked, using their **correct and complete root domain names**, exactly as they appear in the browser (e.g., "www.facebook.com", "www.instagram.com", "leetcode.com", "x.com").
 - The duration for which they should be blocked.
 
 Instructions:
-- Convert casual or slang names like "insta", "yt", "fb" into real domains like  "youtube.com", "www.facebook.com" etc.
+- Convert casual or slang names like "insta", "x", "fb" into real domains like  "www.instagram.com", "x.com, " "www.facebook.com" etc.
 - Always extract a duration. Accept formats like "5s", "5 sec", "10 minutes", "2 hrs", etc.
 - If no duration is mentioned, use the default of **30 minutes**.
 - Normalize all units to readable forms like "1 second", "2 minutes", "1 hour".
+- Don't dare to do anything with youtube.
 
 Return the result as a JSON object like:
 {
-  "websites": ["www.youtube.com", "facebook.com"],
+  "websites": ["facebook.com"],
   "duration": "1 hour"
 }
 
