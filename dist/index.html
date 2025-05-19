@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Website Blocker</title>
+  <title>Taskify</title>
   <style>
     * {
       box-sizing: border-box;
@@ -115,12 +115,22 @@
 #resetBtn:hover {
   background: #a93226;
 }
+#unblockAllBtn {
+      width: 100%;
+      background: #e63946;
+      color: white;
+      margin-top: 10px;
+    }
+
+    #unblockAllBtn:hover {
+      background: #d62828;
+    }
 
   </style>
 </head>
 <body>
   <div class="container">
-    <h2>Website Blocker</h2>
+    <h2>Taskify</h2>
 
     <div class="toggle-group">
       <button id="blockToggle" class="toggle-btn active">Block</button>
@@ -129,6 +139,7 @@
 
     <input type="text" id="userInput" placeholder="Enter your instruction here..." />
     <button id="submitBtn">Submit</button>
+    <button id="unblockAllBtn">Unblock All</button>
     <button id="resetBtn" class="btn danger">Reset YouTube</button>
 
 

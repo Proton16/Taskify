@@ -1,4 +1,3 @@
-// models/sessions.model.js
 import mongoose from 'mongoose';
 
 const sessionSchema = new mongoose.Schema({
@@ -10,6 +9,8 @@ const sessionSchema = new mongoose.Schema({
   title: { type: String, required: true },
   websites: { type: [String], required: true },
   duration: { type: String, default: '30 minutes' },
+  chats: { type: [String], default: [] },   // <-- NEW FIELD
+  tasks: { type: [String], default: [] },   // <-- NEW FIELD
   createdAt: { type: Date, default: Date.now }
 });
 

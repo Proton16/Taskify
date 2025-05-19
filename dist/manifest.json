@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Website Blocker",
+  "name": "Taskify",
   "version": "1.0",
   "description": "Block distracting websites based on user prompt.",
   "permissions": ["storage", "webRequest", "webRequestBlocking", "declarativeNetRequest"],

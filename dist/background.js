@@ -1,17 +1,6 @@
 chrome.runtime.onInstalled.addListener(() => {
     chrome.storage.local.get("blockedSites", ({ blockedSites }) => {
         if (!blockedSites) {
-            // ⛔️ If you want default blocked sites on install, uncomment below:
-            /*
-            let defaultSites = [
-                { domain: "www.youtube.com", unblockAt: Date.now() + 30 * 60 * 1000 },
-                { domain: "www.instagram.com", unblockAt: Date.now() + 30 * 60 * 1000 }
-            ];
-            chrome.storage.local.set({ blockedSites: defaultSites }, () => {
-                console.log("✅ Default blocked sites set:", defaultSites);
-                updateBlockRules();
-            });
-            */
             console.log("🚫 No default sites set. Waiting for user input.");
         } else {
             console.log("ℹ️ Blocked sites already exist:", blockedSites);
@@ -56,25 +45,37 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         const msDuration = parseDuration(duration); // Convert to milliseconds
 
         chrome.storage.local.get("blockedSites", ({ blockedSites }) => {
+            // Initialize if undefined
             blockedSites = blockedSites || [];
 
             const now = Date.now();
-            const newEntries = websites.map(domain => ({
-                domain,
-                unblockAt: now + msDuration
-            }));
-
-            // Filter out duplicates
-            const updatedSites = [
-                ...blockedSites.filter(existing => !websites.includes(existing.domain)),
-                ...newEntries
-            ];
+            const updatedSites = [...blockedSites]; // Make a copy of existing sites
+            
+            // Add new websites or update existing ones
+            websites.forEach(domain => {
+                // Check if this domain is already blocked
+                const existingIndex = updatedSites.findIndex(site => site.domain === domain);
+                
+                if (existingIndex >= 0) {
+                    // Update the existing site with new unblock time
+                    updatedSites[existingIndex].unblockAt = now + msDuration;
+                } else {
+                    // Add as a new blocked site
+                    updatedSites.push({
+                        domain,
+                        unblockAt: now + msDuration
+                    });
+                }
+            });
 
             chrome.storage.local.set({ blockedSites: updatedSites }, () => {
-                console.log("🚫 New sites blocked:", updatedSites);
+                console.log("🚫 Updated blocked sites:", updatedSites);
                 updateBlockRules();
+                sendResponse({success: true}); // Send response back to popup
             });
         });
+        
+        return true; // Required for async response
     }
 });
 
@@ -135,14 +136,13 @@ chrome.storage.onChanged.addListener((changes, area) => {
         console.log("🔁 Blocked sites updated:", changes.blockedSites.newValue);
         updateBlockRules();
     }
+});
 
-    chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-        if (message.action === "reset_youtube") {
-            chrome.storage.local.set({ shouldReset: true }, () => {
-                console.log("Resetting YouTube settings...");
-                // Insert logic to actually reset YouTube here, if not already elsewhere
-            });
-        }
-    });
-    
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if (message.action === "reset_youtube") {
+        chrome.storage.local.set({ shouldReset: true }, () => {
+            console.log("Resetting YouTube settings...");
+            // Insert logic to actually reset YouTube here, if not already elsewhere
+        });
+    }
 });

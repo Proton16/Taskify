@@ -161,14 +161,13 @@
 
 
 
-
-
 const API_KEY = "AIzaSyCyGCSXiULz7U-4Izvxj4yfi7yWHKNtmZ0";
 const submitBtn = document.getElementById("submitBtn");
 const resetBtn = document.getElementById("resetBtn");
 const focusToggle = document.getElementById("focusToggle");
 const blockToggle = document.getElementById("blockToggle");
 const statusEl = document.getElementById("status");
+const unblockAllBtn = document.getElementById('unblockAllBtn');
 resetBtn.style.display = "none";
 
 let currentMode = "block"; // default
@@ -187,12 +186,15 @@ function updateToggleStyles() {
 
 blockToggle.addEventListener("click", () => {
   currentMode = "block";
+  unblockAllBtn.style.display = 'block';
   updateToggleStyles();
 });
 
 focusToggle.addEventListener("click", () => {
   currentMode = "focus";
+  unblockAllBtn.style.display = 'none';
   updateToggleStyles();
+   
 });
 
 // 🧠 Main handler
@@ -208,8 +210,13 @@ submitBtn.addEventListener("click", async () => {
     chrome.runtime.sendMessage({
       type: "BLOCK_DATA",
       payload: extracted
-    }, () => {
-      loadBlockedSites();
+    }, (response) => {
+      if (response && response.success) {
+        // Clear the input field on successful submission
+        document.getElementById("userInput").value = "";
+        loadBlockedSites();
+        updateCountdowns();
+      }
     });
 
   } else if (currentMode === "focus") {
@@ -219,6 +226,25 @@ submitBtn.addEventListener("click", async () => {
       window.open("https://www.youtube.com", "_blank");
     });
   }
+});
+
+
+//unblocking of all websites
+document.getElementById("unblockAllBtn").addEventListener("click", () => {
+  chrome.declarativeNetRequest.getDynamicRules((rules) => {
+    const ruleIds = rules.map(rule => rule.id);
+
+    chrome.declarativeNetRequest.updateDynamicRules({
+      removeRuleIds: ruleIds
+    }, () => {
+      chrome.storage.local.set({ blockedSites: [] }, () => {
+        console.log("🧹 All sites unblocked!");
+        loadBlockedSites();      // Refresh list
+        updateCountdowns();      // Refresh countdown display
+        document.getElementById("status").textContent = "✅ All sites unblocked!";
+      });
+    });
+  });
 });
 
 // 🤖 Gemini API block extractor
@@ -239,7 +265,7 @@ Instructions:
 
 Return the result as a JSON object like:
 {
-  "websites": ["facebook.com"],
+  "websites": ["facebook.com", "instagram.com", "x.com"]
   "duration": "1 hour"
 }
 
@@ -296,6 +322,7 @@ function updateCountdowns() {
     }
 
     const now = Date.now();
+    let allExpired = true;
 
     blockedSites.forEach(site => {
       const timeLeft = site.unblockAt - now;
@@ -304,12 +331,18 @@ function updateCountdowns() {
 
       if (timeLeft > 0) {
         div.textContent = `${site.domain} ⏳ ${formatTimeLeft(timeLeft)}`;
+        allExpired = false;
       } else {
         div.textContent = `${site.domain} ✅ Unblocked`;
       }
 
       container.appendChild(div);
     });
+    
+    // If all sites are expired, auto-unblock them
+    if (allExpired && blockedSites.length > 0) {
+      document.getElementById("unblockAllBtn").click();
+    }
   });
 }
 
@@ -319,9 +352,16 @@ function loadBlockedSites() {
     const list = document.getElementById("blockedList");
     list.innerHTML = "";
 
+    if (sites.length === 0) {
+      const li = document.createElement("li");
+      li.textContent = "No sites currently blocked";
+      list.appendChild(li);
+      return;
+    }
+
     sites.forEach(site => {
       const li = document.createElement("li");
-      li.textContent = site;
+      li.textContent = site.domain; // Make sure to access the domain property
       list.appendChild(li);
     });
   });

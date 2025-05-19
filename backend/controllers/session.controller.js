@@ -1,4 +1,3 @@
-// controllers/session.controller.js
 import express from "express";
 import Session from "../models/sessions.model.js";
 import mongoose from "mongoose";
@@ -7,7 +6,16 @@ export const createSession = async (req, res) => {
   try {
     const session = new Session(req.body);
     await session.save();
-    res.status(201).json(session);
+    res.status(201).json({
+      _id: session._id,
+      userId: session.userId,
+      title: session.title,
+      websites: session.websites,
+      duration: session.duration,
+      chats: session.chats,      // Always included!
+      tasks: session.tasks,      // Always included!
+      createdAt: session.createdAt
+    });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -17,12 +25,20 @@ export const createSession = async (req, res) => {
 export const getAllSessions = async (req, res) => {
   try {
     const sessions = await Session.find().sort({ createdAt: -1 });
-    res.json(sessions);
+    res.json(sessions.map(session => ({
+      _id: session._id,
+      userId: session.userId,
+      title: session.title,
+      websites: session.websites,
+      duration: session.duration,
+      chats: session.chats,
+      tasks: session.tasks,
+      createdAt: session.createdAt
+    })));
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
-
 
 // Get session by ID
 export const getSessionById = async (req, res) => {
@@ -39,7 +55,16 @@ export const getSessionById = async (req, res) => {
       return res.status(404).json({ error: "Session not found" });
     }
 
-    res.json(session);
+    res.json({
+      _id: session._id,
+      userId: session.userId,
+      title: session.title,
+      websites: session.websites,
+      duration: session.duration,
+      chats: session.chats,
+      tasks: session.tasks,
+      createdAt: session.createdAt
+    });
   } catch (err) {
     console.error("Error fetching session:", err);
     res.status(500).json({ error: err.message });
